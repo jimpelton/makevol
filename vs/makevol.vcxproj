@@ -142,7 +142,11 @@
     <ClCompile Include="..\src\makevol.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\bbox.h" />
+    <ClInclude Include="..\src\cuboidvolume.h" />
     <ClInclude Include="..\src\point3.h" />
+    <ClInclude Include="..\src\sphericalvolume.h" />
+    <ClInclude Include="..\src\Volume.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
