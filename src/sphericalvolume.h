@@ -22,15 +22,13 @@ public:
     virtual void generate() override 
     {
         size_t voxels = m_ext.num_vox();
-        float range = m_max - m_min;
-        float delta = range / m_dataExt.num_vox();
         Point3 ext_dims(m_ext.dims());
-
+        float range = m_max - m_min;
         std::cout << "Creating spherical volume with values: \n"
             "\tMax, Min (range): " << m_max << ", " << m_min << " (" << range << ")\n"
             "\tWxHxD: " << ext_dims.x() << "x" << ext_dims.y() << "x" << ext_dims.z() << "\n"
-            "\tNumber of values created (voxels): " << voxels << "\n"
-            "\tDelta: " << delta << std::endl;
+            "\tNumber of values created (voxels): " << voxels << "\n";
+            //"\tDelta: " << delta << std::endl;
 
         const float zero = 0.0f;
 
@@ -49,6 +47,8 @@ public:
                     (center.y() - y)*(center.y() - y) + (center.z() - z)*(center.z() - z);
 
                 if (dist2 <= rad2) {
+                    // normalize
+                    dist2 = m_max * (dist2 / rad2) + m_min;
                     f.write(reinterpret_cast<char*>(&dist2), sizeof(float));
                 } else {
                     f.write(reinterpret_cast<const char*>(&zero), sizeof(float));
