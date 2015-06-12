@@ -18,28 +18,23 @@ public:
 
     ~Point3() { }
 
-    inline friend bool operator<(const Point3 &lhs, const Point3 &rhs)
-    {
+    inline friend bool operator<(const Point3 &lhs, const Point3 &rhs) {
         return lhs.m_x < rhs.m_x && lhs.m_y < rhs.m_y && lhs.m_z < rhs.m_z;
     }
 
-    inline friend bool operator>(const Point3 &lhs, const Point3 &rhs)
-    {
+    inline friend bool operator>(const Point3 &lhs, const Point3 &rhs) {
         return rhs < lhs;
     }
 
-    inline friend bool operator<=(const Point3 &lhs, const Point3 &rhs)
-    {
+    inline friend bool operator<=(const Point3 &lhs, const Point3 &rhs) {
         return !(lhs > rhs);
     }
 
-    inline friend bool operator>=(const Point3 &lhs, const Point3 &rhs)
-    {
+    inline friend bool operator>=(const Point3 &lhs, const Point3 &rhs) {
         return !(lhs < rhs);
     }
 
-    Point3& operator-=(const Point3 &rhs)
-    {
+    Point3 &operator-=(const Point3 &rhs) {
         m_x -= rhs.m_x;
         m_y -= rhs.m_y;
         m_z -= rhs.m_z;
@@ -47,16 +42,14 @@ public:
         return *this;
     }
 
-    const Point3 operator-(const Point3 &v) const
-    {
+    const Point3 operator-(const Point3 &v) const {
         Point3 rval(*this);
         rval -= v;
 
         return rval;
     }
 
-    Point3& operator+=(const Point3 &rhs)
-    {
+    Point3 &operator+=(const Point3 &rhs) {
         m_x += rhs.m_x;
         m_y += rhs.m_y;
         m_z += rhs.m_z;
@@ -64,16 +57,14 @@ public:
         return *this;
     }
 
-    Point3 operator+(const Point3 &v) const
-    {
+    Point3 operator+(const Point3 &v) const {
         Point3 rval(*this);
         rval += v;
 
         return rval;
     }
 
-    Point3& operator/=(const Point3 &rhs)
-    {
+    Point3 &operator/=(const Point3 &rhs) {
         m_x /= rhs.m_x;
         m_y /= rhs.m_y;
         m_z /= rhs.m_z;
@@ -81,34 +72,29 @@ public:
         return *this;
     }
 
-    Point3 operator/(const Point3 &v) const
-    {
+    Point3 operator/(const Point3 &v) const {
         Point3 rval(*this);
         rval /= v;
 
         return rval;
     }
 
-    Point3 operator/(float s) const
-    {
+    Point3 operator/(float s) const {
         Point3 rval(*this);
         rval /= Point3(s, s, s);
 
         return rval;
     }
 
-    size_t x() const
-    {
+    size_t x() const {
         return m_x;
     }
 
-    size_t y() const
-    {
+    size_t y() const {
         return m_y;
     }
 
-    size_t z() const
-    {
+    size_t z() const {
         return m_z;
     }
 

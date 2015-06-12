@@ -7,13 +7,13 @@
 
 class Volume {
 public:
-    Volume(const BBox &ext, const BBox &dataExt, float minval, float maxval, const std::string &outfilePath)
-        : m_outfilePath(outfilePath)
-        , m_ext(ext)
-        , m_dataExt(dataExt)
-        , m_min(minval)
-        , m_max(maxval)
-    { }
+    Volume(const BBox &ext, const BBox &dataExt, float minval, float maxval,
+           const std::string &outfilePath)
+            : m_outfilePath(outfilePath),
+              m_ext(ext),
+              m_dataExt(dataExt),
+              m_min(minval),
+              m_max(maxval) { }
 
     virtual ~Volume() { }
 

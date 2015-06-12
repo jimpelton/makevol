@@ -23,10 +23,12 @@ set(HEADER_FILES
     src/point3.h
     src/sphericalvolume.h
     src/Volume.h
+    src/clargs.h
 )
 
 set(SOURCE_FILES 
-    src/makevol.cpp 
+    src/makevol.cpp
+    src/clargs.cpp
 )
 
 include_directories("3rdParty/tclap/include")
