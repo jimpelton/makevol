@@ -1,14 +1,17 @@
 
 
+#include "bbox.h"
+#include "sphericalvolume.h"
+#include "cuboidvolume.h"
+
+#include <tclap/CmdLine.h>
 
 #include <iostream>
 #include <limits>
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "bbox.h"
-#include "sphericalvolume.h"
-#include "cuboidvolume.h"
+
 
 void writeDatFile(const std::string &prefix, 
     size_t resx, size_t resy, size_t resz,
@@ -47,6 +50,99 @@ void usage(const std::string &msg)
 void usage() 
 {
     usage("");
+}
+
+
+enum class VolumeType
+{
+    Cube,
+    Sphere,
+    File,
+    MAX
+};
+
+struct CommandLineOpts
+{
+    size_t volXDim;
+    size_t volYDim;
+    size_t volZDim;
+
+    size_t volBorderX;
+    size_t volBorderY;
+    size_t volBorderZ;
+
+    float minval;
+    float maxval;
+
+    std::string outVolFile;
+    std::string outDatFile;
+
+};
+
+int parseThem(int argc, const char *argv[], CommandLineOpts &opts)
+try
+{
+    TCLAP::CmdLine cmd("Make 3D data in your living room!", ' ');
+
+    const std::string defaultVolName = "outvolume.raw";
+    const std::string defaultDatName = "outvolume.dat";
+
+    TCLAP::ValueArg<std::string> outVolFileArg("f", "vol-file", "Output data file", false, defaultVolName, "string");
+    cmd.add(outVolFileArg);
+
+    TCLAP::ValueArg<std::string> outDatfileArg("f", "dat-file", "Output .dat file (descriptor file)", false, defaultDatName, "string");
+    cmd.add(outDatfileArg);
+
+    // volume dims
+    TCLAP::ValueArg<size_t> xdimArg("", "volx", "Volume x dim.", false, 1, "uint");
+    cmd.add(xdimArg);
+
+    TCLAP::ValueArg<size_t> ydimArg("", "voly", "Volume y dim.", false, 1, "uint");
+    cmd.add(ydimArg);
+
+    TCLAP::ValueArg<size_t> zdimArg("", "volz", "Volume z dim.", false, 1, "uint");
+    cmd.add(zdimArg);
+
+    // volume dims
+    TCLAP::ValueArg<size_t> xBorderArg("", "bx", "Border x width.", false, 1, "uint");
+    cmd.add(xBorderArg);
+
+    TCLAP::ValueArg<size_t> yBorderArg("", "by", "Border y height.", false, 1, "uint");
+    cmd.add(yBorderArg);
+
+    TCLAP::ValueArg<size_t> zBorderArg("", "bz", "Border z depth.", false, 1, "uint");
+    cmd.add(zBorderArg);
+
+    TCLAP::ValueArg<float> minValArg("", "min", "Min generated value.", false, 0.0f, "float");
+    cmd.add(zBorderArg);
+
+    TCLAP::ValueArg<float> maxValArg("", "max", "Max generated value.", false, 1.0f, "float");
+    cmd.add(zBorderArg);
+
+    TCLAP::ValueArg<std::string> volumeTypeArg("s", "shape", "Shape of the volume", false, "sphere", "string");
+
+    cmd.parse(argc, argv);
+
+    opts.volXDim = xdimArg.getValue();
+    opts.volYDim = ydimArg.getValue();
+    opts.volZDim = zdimArg.getValue();
+
+    opts.volBorderX= xBorderArg.getValue();
+    opts.volBorderY= yBorderArg.getValue();
+    opts.volBorderZ= zBorderArg.getValue();
+
+    opts.minval = minValArg.getValue();
+    opts.maxval = minValArg.getValue();
+
+    opts.outVolFile = outVolFileArg.getValue();
+    opts.outDatFile = outDatfileArg.getValue();
+
+    return argc;
+
+} catch (TCLAP::ArgException &e) {
+    std::cout << "Error parsing command line args: " << e.error() <<
+        " for argument " << e.argId() << std::endl;
+    return 0;
 }
 
 int main (int argc, char* argv[]) 

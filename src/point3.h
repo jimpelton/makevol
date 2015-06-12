@@ -2,7 +2,11 @@
 #define point3_h__
 
 
+#include <cstddef>
+
 class Point3 {
+
+
 public:
     Point3() : m_x(0), m_y(0), m_z(0) { }
 

@@ -44,4 +44,5 @@ private:
 
 };
 
-#endif
+#endif // !bbox_h__
+
