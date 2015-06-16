@@ -1,6 +1,6 @@
 #include "bbox.h"
 #include "sphericalvolume.h"
-#include "cuboidvolume.h"
+//#include "cuboidvolume.h"
 #include "point3.h"
 #include "clargs.h"
 
@@ -10,7 +10,18 @@
 #include <string>
 #include <sstream>
 
+using P3f = Point3<float>;
+using BBfloat = BBox<float>;
 
+enum class VolumeType {
+    Cube,
+    Sphere,
+    File,
+    MAX
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
 void writeDatFile(const std::string &prefix,
                   size_t resx, size_t resy, size_t resz,
                   unsigned int thickX, unsigned int thickY, unsigned int thickZ,
@@ -37,36 +48,50 @@ void writeDatFile(const std::string &prefix,
     file.close();
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
 void usage(const std::string &msg) {
     if (!msg.empty()) {
         std::cout << msg << "\n";
     }
 
-    std::cout << "usage: width height depth [minval maxval] [bx by bz]\n"
-            "\t bx, by, bz define an empty border region of 0.0f values." <<
-    std::endl;
+    std::cout << "Use -h for command line arguments." << std::endl;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
 void usage() {
     usage("");
 }
 
 
-enum class VolumeType {
-    Cube,
-    Sphere,
-    File,
-    MAX
-};
+///////////////////////////////////////////////////////////////////////////////
+template<typename T>
+int makeVol(CommandLineOpts &opts, const BBox<T> &vol, const BBox<T> &inner)
+{
+//    if (opts.volShape == "cube") {
+//        CuboidVolume cube(vol, inner, opts.minval, opts.maxval, opts.outVolFile);
+//        cube.generate(1024);
+//    } else
+    if (opts.volShape == "sphere") {
+        SphericalVolume<T> sph(vol, inner, opts.minval, opts.maxval, opts.outVolFile);
+        sph.generate(1024);
+    } else {
+        std::cout << "Not a valid volume shape." << std::endl;
+        return 0;
+    }
+
+    return 1;
+}
 
 
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, const char *argv[]) {
     CommandLineOpts opts;
     if (parseThem(argc, argv, opts) == 0) {
         usage();
         return 1;
     }
-
 
     float range{ opts.maxval - opts.minval };
 
@@ -75,38 +100,18 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 
-    BBox vol{ Point3(0, 0, 0), Point3(opts.volXDim, opts.volYDim, opts.volZDim) };
+    BBfloat vol{ P3f(0, 0, 0), P3f(opts.volXDim, opts.volYDim, opts.volZDim) };
+    BBfloat inner{
+        P3f(opts.volBorderX, opts.volBorderY, opts.volBorderZ),
+        P3f(opts.volXDim - opts.volBorderX,
+            opts.volYDim - opts.volBorderY,
+            opts.volZDim - opts.volBorderZ ) };
 
-    BBox inner{ Point3(opts.volBorderX,
-                      opts.volBorderY,
-                      opts.volBorderZ),
-               Point3(opts.volXDim - opts.volBorderX,
-                      opts.volYDim - opts.volBorderY,
-                      opts.volZDim - opts.volBorderZ
-               ) };
-
-    if (opts.volShape == "cube") {
-
-        CuboidVolume cube(vol, inner, opts.minval, opts.maxval,
-                          opts.outVolFile);
-        cube.generate();
-        writeDatFile(opts.outDatFile,
-                     opts.volXDim, opts.volYDim, opts.volZDim,
-                     1, 1, 1,
-                     "FLOAT");
-    }
-    else if (opts.volShape == "sphere") {
-        SphericalVolume sph(vol, inner, opts.minval, opts.maxval, opts.outVolFile);
-        sph.generate();
-        writeDatFile(opts.outDatFile,
-                     opts.volXDim, opts.volYDim, opts.volZDim,
-                     1, 1, 1,
-                     "FLOAT");
-    }
-    else {
-        std::cout << "Not a valid volume shape." << std::endl;
+    if (! makeVol<float>(opts, vol, inner)) {
         exit(1);
     }
+
+    writeDatFile(opts.outDatFile, opts.volXDim, opts.volYDim, opts.volZDim, 1, 1, 1, "FLOAT");
 
     std::cout << "El fin! (supposed success!)." << std::endl;
     return 0;

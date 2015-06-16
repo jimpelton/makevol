@@ -7,63 +7,79 @@
 #include <iostream>
 #include <fstream>
 
-/** \brief Sphere shaped volume filling extent with dimensions of \c size-diff.
-*
-*/
-class SphericalVolume : public Volume {
+/// \brief Sphere shaped volume filling extent with dimensions of \c size-diff.
+template<typename T>
+class SphericalVolume : public Volume<T>
+{
 public:
-    SphericalVolume(const BBox &ext, const BBox &dataExt, 
-        float min, float max, 
-        const std::string &outfilePath)
-        : Volume(ext, dataExt, min, max, outfilePath) { }
+    using vol_type = Volume<T>;
 
-    virtual ~SphericalVolume() { }
-
-    virtual void generate() override 
+    SphericalVolume( const BBox<T> &ext,
+        const BBox<T> &dataExt,
+        float min,
+        float max,
+        const std::string &outfilePath )
+        : Volume<T>(ext, dataExt, min, max, outfilePath)
+        , m_curZ{0}
+        , m_curY{0}
+        , m_curX{0}
     {
-        size_t voxels = m_ext.num_vox();
-        Point3 ext_dims(m_ext.dims());
-        float range = m_max - m_min;
-        std::cout << "Creating spherical volume with values: \n"
-            "\tMax, Min (range): " << m_max << ", " << m_min << " (" << range << ")\n"
-            "\tWxHxD: " << ext_dims.x() << "x" << ext_dims.y() << "x" << ext_dims.z() << "\n"
-            "\tNumber of values created (voxels): " << voxels << "\n";
-            //"\tDelta: " << delta << std::endl;
-
-        const float zero = 0.0f;
-
-        std::ofstream f(m_outfilePath.c_str(), std::ofstream::binary);
-        Point3 dataDims(m_dataExt.dims());
-        Point3 center = (m_dataExt.min() + m_dataExt.max()) / 2.0f;
-        float rad2 = (dataDims.x() / 2.0f) * (dataDims.x() / 2.0f);
-
-        for (size_t z = 0; z < ext_dims.z(); ++z)
-        for (size_t y = 0; y < ext_dims.y(); ++y)
-        for (size_t x = 0; x < ext_dims.x(); ++x)
-        {
-            if (m_dataExt.contains({ x, y, z })) {
-
-                float dist2 = (center.x() - x)*(center.x() - x) +
-                    (center.y() - y)*(center.y() - y) + (center.z() - z)*(center.z() - z);
-
-                if (dist2 <= rad2) {
-                    // normalize
-                    dist2 = m_max * (dist2 / rad2) + m_min;
-                    f.write(reinterpret_cast<char*>(&dist2), sizeof(float));
-                } else {
-                    f.write(reinterpret_cast<const char*>(&zero), sizeof(float));
-                }
-
-            } else {
-                f.write(reinterpret_cast<const char*>(&zero), sizeof(float));
-            }
-        }
-
-        f.flush();
-        f.close();
-
+        m_center = (vol_type::m_dataExt.min() + vol_type::m_dataExt.max()) / 2.0f;
+        Point3<T> dims{ vol_type::m_dataExt.dims() };
+        m_rad2 = (dims.x() / 2.0f) * (dims.x() / 2.0f);
     }
 
-};
+    virtual
+    ~SphericalVolume() { }
+
+    /// \brief Fill buf with distances
+    virtual size_t
+    next(T *buf, size_t bufsize) override
+    {
+        T *start = buf;
+        T *end = buf + bufsize;
+        for ( ; m_curZ < vol_type::m_voxExtent.dims().z(); ++m_curZ)
+        for ( ; m_curY < vol_type::m_voxExtent.dims().y(); ++m_curY)
+        for ( ; m_curX < vol_type::m_voxExtent.dims().x(); ++m_curX) {
+            if (buf>=end) {
+                return buf-start;
+            }
+
+            if (vol_type::m_dataExt.contains({m_curX, m_curY, m_curZ})) {
+                *buf = computeDistSquared();
+            } else {
+                *buf = 0;
+            }
+
+            ++buf;
+        }
+
+        return buf-start;
+    }
+
+private:
+
+    /// \brief Compute distance to center.
+    T
+    computeDistSquared()
+    {
+        T xdiff { m_center.x() - m_curX };
+        T ydiff { m_center.y() - m_curY };
+        T zdiff { m_center.z() - m_curZ };
+        T dist2 { xdiff*xdiff + ydiff*ydiff + zdiff*zdiff };
+        if (dist2 <= m_rad2)   // normalize
+            return vol_type::m_max * (dist2 / m_rad2) + vol_type::m_min;
+
+        return 0;
+    }
+
+
+    size_t m_curZ;
+    size_t m_curY;
+    size_t m_curX;
+    Point3<float> m_center;  ///< Sphere center
+    float m_rad2;     ///< Radius^2
+
+}; // SphericalVolume
 
 #endif

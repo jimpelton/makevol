@@ -19,7 +19,7 @@ project(makevol)
 
 set(HEADER_FILES 
     src/bbox.h
-    src/cuboidvolume.h
+#    src/cuboidvolume.h
     src/point3.h
     src/sphericalvolume.h
     src/Volume.h
