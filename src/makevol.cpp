@@ -99,10 +99,10 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 
-    BBfloat vol{ P3f(0, 0, 0), P3f(opts.volXDim, opts.volYDim, opts.volZDim) };
-    BBfloat inner{
-        P3f(opts.volBorderX, opts.volBorderY, opts.volBorderZ),
-        P3f(opts.volXDim - opts.volBorderX,
+    BBox<size_t> vol{ Point3<size_t>(0, 0, 0), Point3<size_t>(opts.volXDim, opts.volYDim, opts.volZDim) };
+    BBox<size_t> inner{
+        Point3<size_t>(opts.volBorderX, opts.volBorderY, opts.volBorderZ),
+        Point3<size_t>(opts.volXDim - opts.volBorderX,
             opts.volYDim - opts.volBorderY,
             opts.volZDim - opts.volBorderZ ) };
 

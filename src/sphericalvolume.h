@@ -14,15 +14,16 @@ class SphericalVolume : public Volume<T>
 public:
     using vol_type = Volume<T>;
 
-    SphericalVolume(const BBox<T> &ext, const BBox<T> &dataExt, float min, float max)
+    SphericalVolume(const BBox<size_t> &ext, const BBox<size_t> &dataExt, float min, float max)
         : Volume<T>(ext, dataExt)
         , m_min(min)
         , m_max(max)
+        , m_vox(0)
     {
-        auto extMin = vol_type::dataExtent().min();
-        auto extMax = vol_type::dataExtent().max();
-        m_center = (extMax + extMin) / 2.0f;
-        auto x = vol_type::dataExtent().dims().x();
+        auto extMin = ext.min();
+        auto extMax = ext.max();
+        m_center = (extMax + extMin) / 2;
+        auto x = dataExt.dims().x();
         m_rad2 = (x * 0.5f) * (x * 0.5f);
     }
 
@@ -34,8 +35,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     virtual size_t next(T *buf, size_t bufsize) override
     {
-        T *start = buf;
-        T *end = buf + bufsize;
+        T const * const start = buf;
+        T const * const end = buf + bufsize;
         while(m_vox < vol_type::numVox()) {
             if (buf>=end) {
                 m_vox += buf - start;
@@ -48,7 +49,7 @@ public:
 
 
             if (vol_type::dataExtent().contains({x,y,z})) {
-                *buf = computeDistSquared(x, y, z);
+                *buf = computeDistSquared(T(x), T(y), T(z));
             } else {
                 *buf = 0;
             }
@@ -62,7 +63,7 @@ public:
 private:
 
     /// \brief Compute distance to center.
-    T computeDistSquared(size_t x, size_t y, size_t z)
+    T computeDistSquared(T x, T y, T z)
     {
         T xdiff { m_center.x() - x };
         T ydiff { m_center.y() - y };
@@ -75,12 +76,11 @@ private:
     }
 
 
-    T m_min;
-    T m_max;
-    Point3<float> m_center;  ///< Sphere center
-    float m_rad2;            ///< Radius^2
-
-    size_t m_vox;
+    T m_min;                 ///< Minimum voxel value.
+    T m_max;                 ///< Maximum voxel value.
+    Point3<T> m_center;      ///< Sphere center.
+    T m_rad2;                ///< Radius^2.
+    size_t m_vox;            ///< Number of voxels processed so far.
 
 }; // SphericalVolume
 
