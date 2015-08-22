@@ -15,6 +15,10 @@ public:
 
     Point3(const Point3 &o) : m_x(o.m_x), m_y(o.m_y), m_z(o.m_z) { }
 
+    template<typename U>
+    Point3(const Point3<U> &o) : m_x(T(o.x())), m_y(T(o.y())), m_z(T(o.z()))
+    { }
+
     ~Point3() { }
 
     inline friend bool operator<(const Point3 &lhs, const Point3 &rhs) {
@@ -78,7 +82,7 @@ public:
         return rval;
     }
 
-    Point3 operator/(float s) const {
+    Point3 operator/(T s) const {
         Point3 rval(*this);
         rval /= Point3(s, s, s);
 

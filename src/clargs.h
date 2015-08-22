@@ -6,6 +6,7 @@
 #define clargs_h__
 
 #include <string>
+#include <iostream>
 
 struct CommandLineOpts {
     std::string outVolFile;
@@ -26,5 +27,5 @@ struct CommandLineOpts {
 };
 
 int parseThem(int argc, const char *argv[], CommandLineOpts &opts);
-
+void printThem(std::ostream &, CommandLineOpts const &);
 #endif // !clargs_h__

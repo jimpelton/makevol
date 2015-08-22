@@ -67,31 +67,30 @@ void usage() {
 
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-int makeVol(CommandLineOpts &opts, const BBox<T> &vol, const BBox<T> &inner)
+size_t makeVol(CommandLineOpts &opts, const BBox<T> &vol, const BBox<T> &inner)
 {
 //    if (opts.volShape == "cube") {
 //        CuboidVolume cube(vol, inner, opts.minval, opts.maxval, opts.outVolFile);
 //        cube.generate(1024);
 //    } else
     if (opts.volShape == "sphere") {
-        SphericalVolume<T> sph(vol, inner, opts.minval, opts.maxval, opts.outVolFile);
-        sph.generate(1024);
+        SphericalVolume<T> sph(vol, inner, opts.minval, opts.maxval);
+        sph.outfile(opts.outVolFile);
+        return sph.generate(1024);
     } else {
         std::cout << "Not a valid volume shape." << std::endl;
         return 0;
     }
 
-    return 1;
+    return 0;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, const char *argv[]) {
     CommandLineOpts opts;
-    if (parseThem(argc, argv, opts) == 0) {
-        usage();
-        return 1;
-    }
+    parseThem(argc, argv, opts);
+    printThem(std::cout, opts);
 
     float range{ opts.maxval - opts.minval };
 

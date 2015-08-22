@@ -16,8 +16,18 @@ public:
     { }
 
     BBox(const BBox &o)
+        : m_minp(o.m_minp)
+        , m_maxp(o.m_maxp)
+        , m_dims(o.m_dims)
+        , m_numVox(o.m_numVox)
+    { }
+
+    template<typename U>
+    BBox(const BBox<U> &o)
         : m_minp(o.min())
         , m_maxp(o.max())
+        , m_dims(o.dims())
+        , m_numVox(o.num_vox())
     { }
 
     ~BBox() { }
@@ -29,14 +39,14 @@ public:
         m_maxp -= diff.m_maxp;
     }
 
-    const Point3<T>& dims() { return m_dims; }
+    Point3<T> const & dims() const { return m_dims; }
 
     inline size_t num_vox() const { return m_numVox; }
 
-    inline bool contains(const Point3<T> &p) { return p < m_maxp && p > m_minp; }
+    inline bool contains(const Point3<T> &p) const { return p < m_maxp && p > m_minp; }
 
-    inline const Point3<T>& min() const { return m_minp; }
-    inline const Point3<T>& max() const { return m_maxp; }
+    inline Point3<T> const & min() const { return m_minp; }
+    inline Point3<T> const & max() const { return m_maxp; }
 
 private:
     Point3<T> m_minp, m_maxp;
