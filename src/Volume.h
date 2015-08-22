@@ -44,7 +44,7 @@ public:
         size_t total{ 0 };
         T *buf { new T[bufsize] };
 
-        while(total <= voxels) {
+        while(total < voxels) {
             size_t voxelsWritten{ next(buf, bufsize) };
             f.write(reinterpret_cast<char*>(buf), voxelsWritten * sizeof(T));
             total += voxelsWritten;

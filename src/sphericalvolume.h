@@ -37,11 +37,11 @@ public:
     {
         T const * const start = buf;
         T const * const end = buf + bufsize;
-        while(m_vox < vol_type::numVox()) {
-            if (buf>=end) {
-                m_vox += buf - start;
-                return buf-start;
-            }
+        while(buf < end && m_vox < vol_type::numVox()) {
+//            if (buf>=end) {
+//                m_vox += ((buf - start));
+//                return ((buf-start));
+//            }
 
             size_t z =  m_vox %  vol_type::extZ();
             size_t y = (m_vox /  vol_type::extZ()) % vol_type::extY();
@@ -55,6 +55,7 @@ public:
             }
 
             ++buf;
+            ++m_vox;
         }
 
         return buf-start;
