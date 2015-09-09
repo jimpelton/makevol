@@ -30,7 +30,7 @@ try {
     // volume shape
     TCLAP::ValueArg<std::string>
             volumeShapeArg("s", "shape", "Shape of the volume", false,
-                           "sphere", "string");
+                           "none", "string");
     cmd.add(volumeShapeArg);
 
 
